@@ -19,7 +19,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       if (!storedUser) return;
 
       const parsed = JSON.parse(storedUser) as User;
-      if (parsed && typeof parsed === "object" && typeof parsed.id === "number") {
+      if (parsed && typeof parsed === "object" && typeof parsed.id === "string") {
         setUser(parsed);
       } else {
         localStorage.removeItem(LS_USER_KEY);

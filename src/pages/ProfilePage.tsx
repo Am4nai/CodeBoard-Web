@@ -7,7 +7,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 
 type UserResponse = {
-  id: number;
+  id: string;
   username: string;
   email: string;
   role: string;
@@ -20,7 +20,7 @@ type UserResponse = {
 };
 
 type UserPostsResponse = {
-  userId: number;
+  userId: string;
   total: number;
   posts: Array<{
     id: number;
@@ -48,14 +48,14 @@ const ProfilePage: React.FC = () => {
   };
 
   const { id } = useParams<{ id: string }>();
-  const profileUserId = Number(id);
+  const profileUserId = id;
 
   const authUser = JSON.parse(localStorage.getItem("user") || "{}");
   const isOwner = authUser?.id === profileUserId;
 
   const [posts, setPosts] = useState<PostCardProps[]>([]);
 
-  const [userId, setUserId] = useState<number | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
 
@@ -70,7 +70,7 @@ const ProfilePage: React.FC = () => {
   const [loadingPosts, setLoadingPosts] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  const fetchPosts = async (uid: number) => {
+  const fetchPosts = async (uid: string) => {
     try {
       setLoadingPosts(true);
       setError("");
@@ -99,7 +99,9 @@ const ProfilePage: React.FC = () => {
   };
 
   const getProfile = async () => {
-    if (!Number.isFinite(profileUserId)) {
+    console.log("user id.", profileUserId);
+    
+    if (!profileUserId) {
       setError("Invalid user id.");
       setLoadingProfile(false);
       setLoadingPosts(false);

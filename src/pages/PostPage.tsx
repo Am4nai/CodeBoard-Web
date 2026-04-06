@@ -17,7 +17,7 @@ import axios from "axios";
 
 type PostByIdResponse = {
   id: number;
-  author_id: number;
+  author_id: string;
   author_name: string;
   author_avatar_url: string | null;
   title: string;
@@ -38,7 +38,7 @@ const PostPage: React.FC = () => {
 
   const navigate = useNavigate();
 
-  const [authorId, setAuthorId] = useState(0);
+  const [authorId, setAuthorId] = useState("");
   const [authorName, setAuthorName] = useState("");
   const [authorAvatarUrl, setAuthorAvatarUrl] = useState<string | null>(null);
 
