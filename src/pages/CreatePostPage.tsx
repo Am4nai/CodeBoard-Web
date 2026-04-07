@@ -1,17 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { api } from "../api/axiosInstance";
 import axios from "axios";
-
-type Language = {
-  id: number;
-  name: string;
-};
-
-type Tag = {
-  id: number;
-  name: string;
-  posts_count: number;
-};
+import type { Language } from "../types/interfaces";
+import type { Tag } from "../types/interfaces";
 
 const CreatePostPage: React.FC = () => {
   const [title, setTitle] = useState("");
@@ -377,7 +368,7 @@ const CreatePostPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setIsTagsModalOpen(true)}
-                className="rounded-lg px-3 py-2 bg-surface-lite hover:bg-surface-lite-focus transition-colors duration-200 text-sm"
+                className="text-text-buttons rounded-lg px-3 py-2 bg-secondary hover:bg-secondary-hover transition-colors duration-200 text-sm"
               >
                 Manage tags
               </button>
@@ -431,7 +422,7 @@ const CreatePostPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={closeTagsModal}
-                  className="rounded-lg px-3 py-2 bg-surface-lite hover:bg-surface-lite-focus transition-colors duration-200"
+                  className="text-text-buttons rounded-lg px-3 py-2 bg-secondary hover:bg-secondary-hover transition-colors duration-200"
                 >
                   Close
                 </button>
@@ -445,7 +436,7 @@ const CreatePostPage: React.FC = () => {
 
               <div className="flex flex-col gap-2">
                 <label className="text-text-secondary text-sm">Selected tags</label>
-                <div className="rounded-xl bg-surface-lite p-3 min-h-[72px] flex flex-wrap gap-2">
+                <div className="rounded-xl bg-surface-lite p-3 min-h-[48px] flex flex-wrap gap-2">
                   {selectedTags.length > 0 ? (
                     selectedTags.map((tag) => (
                       <div
@@ -522,16 +513,6 @@ const CreatePostPage: React.FC = () => {
                 <p className="text-xs text-text-secondary">
                   Create a new tag only if there is no suitable existing tag.
                 </p>
-              </div>
-
-              <div className="flex justify-end">
-                <button
-                  type="button"
-                  onClick={closeTagsModal}
-                  className="rounded-lg px-4 py-3 bg-primary hover:bg-primary-hover text-text-buttons transition-colors duration-200"
-                >
-                  Done
-                </button>
               </div>
             </div>
           </div>

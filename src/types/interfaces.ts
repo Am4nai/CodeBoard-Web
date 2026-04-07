@@ -74,3 +74,140 @@ export interface AddToCollectionDropdownProps {
   onAdded?: (collectionId: number) => void;
   onClose: () => void;
 }
+
+export type CollectionWithPostsResponse = Collection & {
+  posts: Array<{
+    id: number;
+    author_id: number;
+    author_name: string;
+    author_avatar_url: string | null;
+    title: string;
+    description: string | null;
+    about: string | null;
+    code: string;
+    language_id: number;
+    language_name: string;
+    like_count: number;
+    created_at: string;
+    updated_at: string;
+    comment_count: number;
+  }>;
+};
+
+export type Language = {
+  id: number;
+  name: string;
+};
+
+export type Tag = {
+  id: number;
+  name: string;
+  posts_count: number;
+};
+
+export type PostByIdResponse = {
+  id: number;
+  author_id: string;
+  author_name: string;
+  author_avatar_url: string | null;
+  title: string;
+  description: string | null;
+  about: string | null;
+  code: string;
+  language_id: number;
+  language_name: string;
+  like_count: number;
+  comment_count: number;
+  created_at: string;
+  updated_at: string;
+  tags: string[];
+};
+
+export type PostsResponse = {
+  page: number;
+  limit: number;
+  totalPosts: number;
+  totalPages: number;
+  remainingPosts: number;
+  posts: Array<{
+    id: number;
+    author_id: number;
+    author_name: string;
+    author_avatar_url: string | null;
+    title: string;
+    description: string | null;
+    about: string | null;
+    code: string;
+    language_id: number;
+    language_name: string;
+    like_count: number;
+    created_at: string;
+    updated_at: string;
+    comment_count: number;
+  }>;
+};
+
+export type UserResponse = {
+  id: string;
+  username: string;
+  email: string;
+  role: string;
+  created_at: string;
+  profile: {
+    avatar_url: string | null;
+    description: string | null;
+    about: string | null;
+  } | null;
+};
+
+export type UserPostsResponse = {
+  userId: string;
+  total: number;
+  posts: Array<{
+    id: number;
+    author_id: number;
+    author_name: string;
+    author_avatar_url: string | null;
+    title: string;
+    description: string | null;
+    about: string | null;
+    code: string;
+    language_id: number;
+    language_name: string;
+    like_count: number;
+    created_at: string;
+    updated_at: string;
+    comment_count: number;
+  }>;
+};
+
+export type SearchPostsResponse = {
+  posts: Array<{
+    id: number;
+    author_id: number;
+    author_name: string;
+    author_avatar_url: string | null;
+    title: string;
+    description: string | null;
+    about: string | null;
+    code: string;
+    language_id: number;
+    language_name: string;
+    like_count: number;
+    created_at: string;
+    updated_at: string;
+    comment_count: number;
+  }>;
+};
+
+export interface AdminUser {
+  id: number;
+  username: string;
+  email: string;
+  role: string;
+  created_at: string;
+
+  avatar_url: string | null;
+  description: string | null;
+  about: string | null;
+}

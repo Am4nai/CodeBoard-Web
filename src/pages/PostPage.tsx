@@ -14,23 +14,7 @@ import heartoff from "../components/svg/heartoff.svg";
 import hearton from "../components/svg/hearton.svg";
 import commentIcon from "../components/svg/comment.svg";
 import axios from "axios";
-
-type PostByIdResponse = {
-  id: number;
-  author_id: string;
-  author_name: string;
-  author_avatar_url: string | null;
-  title: string;
-  description: string | null;
-  about: string | null;
-  code: string;
-  language_id: number;
-  language_name: string;
-  like_count: number;
-  comment_count: number;
-  created_at: string;
-  updated_at: string;
-};
+import type { PostByIdResponse } from "../types/interfaces";
 
 const PostPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -44,8 +28,10 @@ const PostPage: React.FC = () => {
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [about, setAbout] = useState("");
   const [code, setCode] = useState("");
   const [language, setLanguage] = useState("");
+  const [tags, setTags] = useState<string[]>([]);
 
   const [likeCount, setLikeCount] = useState(0);
   const [commentCount, setCommentCount] = useState(0);
@@ -95,6 +81,10 @@ const PostPage: React.FC = () => {
     }
   };
 
+  const handleTagClick = (tag: string) => {
+    navigate(`/search?query=${encodeURIComponent(`#${tag}`)}`);
+  };
+
   const fetchPostById = async () => {
     if (!Number.isFinite(postId)) {
       setError("Invalid post id.");
@@ -113,8 +103,10 @@ const PostPage: React.FC = () => {
 
       setTitle(p.title);
       setDescription(p.description ?? "");
+      setAbout(p.about ?? "");
       setCode(p.code);
       setLanguage(p.language_name);
+      setTags(p.tags ?? []);
 
       setLikeCount(p.like_count);
       setCommentCount(p.comment_count);
@@ -208,13 +200,13 @@ const PostPage: React.FC = () => {
 
   return (
     <main className="bg-bg text-text px-4 sm:px-6 py-6 min-h-[calc(100vh-8rem)]">
-      {/* Header */}
       <section className="max-w-7xl mx-auto mb-6 animate-fade-up">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
             <h1 className="text-3xl font-bold tracking-tight line-clamp-2">
               {title || "Post"}
             </h1>
+
             <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-text-secondary">
               <button
                 type="button"
@@ -235,6 +227,24 @@ const PostPage: React.FC = () => {
               <span className="truncate">
                 Language: <span className="text-text">{language || "—"}</span>
               </span>
+            </div>
+
+            <div className="mt-4 flex flex-wrap gap-2">
+              {tags.length > 0 ? (
+                tags.map((tag) => (
+                  <button
+                    key={tag}
+                    type="button"
+                    onClick={() => handleTagClick(tag)}
+                    className="inline-flex items-center rounded-full bg-primary/15 border border-primary/30 px-3 py-1 text-sm text-text hover:bg-primary/25 transition-colors duration-200"
+                    title={`Search posts by #${tag}`}
+                  >
+                    #{tag}
+                  </button>
+                ))
+              ) : (
+                <span className="text-sm text-text-secondary">No tags</span>
+              )}
             </div>
           </div>
 
@@ -299,9 +309,13 @@ const PostPage: React.FC = () => {
           <div className="mt-4">
             <h3 className="text-sm font-semibold text-text-secondary">About</h3>
             <div className="mt-2 rounded-xl bg-surface-lite p-4">
-              <p className="text-sm leading-relaxed text-text-secondary whitespace-pre-wrap">
-                {"(No extra details)"}
-              </p>
+              {about ? (
+                <p className="text-sm leading-relaxed text-text-secondary whitespace-pre-wrap">
+                  {about}
+                </p>
+              ) : (
+                <p className="text-sm text-text-secondary">(No extra details)</p>
+              )}
             </div>
           </div>
         </section>
