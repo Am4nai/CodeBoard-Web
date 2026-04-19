@@ -5,40 +5,8 @@ import { api } from "../api/axiosInstance";
 import Masonry from "react-masonry-css";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-
-type UserResponse = {
-  id: number;
-  username: string;
-  email: string;
-  role: string;
-  created_at: string;
-  profile: {
-    avatar_url: string | null;
-    description: string | null;
-    about: string | null;
-  } | null;
-};
-
-type UserPostsResponse = {
-  userId: number;
-  total: number;
-  posts: Array<{
-    id: number;
-    author_id: number;
-    author_name: string;
-    author_avatar_url: string | null;
-    title: string;
-    description: string | null;
-    about: string | null;
-    code: string;
-    language_id: number;
-    language_name: string;
-    like_count: number;
-    created_at: string;
-    updated_at: string;
-    comment_count: number;
-  }>;
-};
+import type { UserResponse } from "../types/interfaces";
+import type { UserPostsResponse } from "../types/interfaces";
 
 const ProfilePage: React.FC = () => {
   const breakpointColumnsObj = {
@@ -48,14 +16,14 @@ const ProfilePage: React.FC = () => {
   };
 
   const { id } = useParams<{ id: string }>();
-  const profileUserId = Number(id);
+  const profileUserId = id;
 
   const authUser = JSON.parse(localStorage.getItem("user") || "{}");
   const isOwner = authUser?.id === profileUserId;
 
   const [posts, setPosts] = useState<PostCardProps[]>([]);
 
-  const [userId, setUserId] = useState<number | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
 
@@ -70,7 +38,7 @@ const ProfilePage: React.FC = () => {
   const [loadingPosts, setLoadingPosts] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  const fetchPosts = async (uid: number) => {
+  const fetchPosts = async (uid: string) => {
     try {
       setLoadingPosts(true);
       setError("");
@@ -99,7 +67,9 @@ const ProfilePage: React.FC = () => {
   };
 
   const getProfile = async () => {
-    if (!Number.isFinite(profileUserId)) {
+    console.log("user id.", profileUserId);
+    
+    if (!profileUserId) {
       setError("Invalid user id.");
       setLoadingProfile(false);
       setLoadingPosts(false);

@@ -4,25 +4,7 @@ import type { Collection, PostCardProps } from "../types/interfaces";
 import Masonry from "react-masonry-css";
 import PostCard from "../components/ui/PostCard";
 import axios from "axios";
-
-type CollectionWithPostsResponse = Collection & {
-  posts: Array<{
-    id: number;
-    author_id: number;
-    author_name: string;
-    author_avatar_url: string | null;
-    title: string;
-    description: string | null;
-    about: string | null;
-    code: string;
-    language_id: number;
-    language_name: string;
-    like_count: number;
-    created_at: string;
-    updated_at: string;
-    comment_count: number;
-  }>;
-};
+import type { CollectionWithPostsResponse } from "../types/interfaces";
 
 const CollectionPage: React.FC = () => {
   const breakpointColumnsObj = {

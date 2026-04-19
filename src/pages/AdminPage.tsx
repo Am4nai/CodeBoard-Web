@@ -1,18 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { api } from "../api/axiosInstance";
 import axios from "axios";
-
-interface AdminUser {
-  id: number;
-  username: string;
-  email: string;
-  role: string;
-  created_at: string;
-
-  avatar_url: string | null;
-  description: string | null;
-  about: string | null;
-}
+import type { AdminUser } from "../types/interfaces";
 
 const AdminPage: React.FC = () => {
   const [users, setUsers] = useState<AdminUser[]>([]);

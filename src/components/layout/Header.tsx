@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import { Menu, X } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
 import { api } from "../../api/axiosInstance";
+import ThemeToggle from "../ui/ThemeToggle";
 
 type UserSearchResult = {
   id: number;
@@ -241,6 +242,8 @@ export default function Header() {
               </Link>
             </>
           )}
+
+          <ThemeToggle />
         </div>
 
         <button
@@ -254,7 +257,10 @@ export default function Header() {
 
       {isMenuOpen && (
         <div className="md:hidden px-4 pb-4 animate-fade-up">
-          {/* Mobile search */}
+          <div className="mt-3 flex justify-end">
+            <ThemeToggle />
+          </div>
+
           <form onSubmit={handleSubmit} className="relative mt-3" ref={searchRef}>
             <input
               type="text"

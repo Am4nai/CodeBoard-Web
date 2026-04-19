@@ -4,25 +4,7 @@ import Masonry from "react-masonry-css";
 import type { PostCardProps } from "../types/interfaces";
 import PostCard from "../components/ui/PostCard";
 import { api } from "../api/axiosInstance";
-
-type SearchPostsResponse = {
-  posts: Array<{
-    id: number;
-    author_id: number;
-    author_name: string;
-    author_avatar_url: string | null;
-    title: string;
-    description: string | null;
-    about: string | null;
-    code: string;
-    language_id: number;
-    language_name: string;
-    like_count: number;
-    created_at: string;
-    updated_at: string;
-    comment_count: number;
-  }>;
-};
+import type { SearchPostsResponse } from "../types/interfaces";
 
 const SearchPage: React.FC = () => {
   const navigate = useNavigate();

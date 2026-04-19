@@ -3,30 +3,7 @@ import Masonry from "react-masonry-css";
 import PostCard from "../components/ui/PostCard";
 import type { PostCardProps } from "../types/interfaces";
 import { api } from "../api/axiosInstance";
-
-type PostsResponse = {
-  page: number;
-  limit: number;
-  totalPosts: number;
-  totalPages: number;
-  remainingPosts: number;
-  posts: Array<{
-    id: number;
-    author_id: number;
-    author_name: string;
-    author_avatar_url: string | null;
-    title: string;
-    description: string | null;
-    about: string | null;
-    code: string;
-    language_id: number;
-    language_name: string;
-    like_count: number;
-    created_at: string;
-    updated_at: string;
-    comment_count: number;
-  }>;
-};
+import type { PostsResponse } from "../types/interfaces";
 
 const HomePage: React.FC = () => {
   const breakpointColumnsObj = {
