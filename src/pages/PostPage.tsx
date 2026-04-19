@@ -55,6 +55,14 @@ const PostPage: React.FC = () => {
     return raw.replace(/\s+/g, "");
   }, [language]);
 
+  const lineCount = useMemo(() => {
+    return Math.max(1, code.split("\n").length);
+  }, [code]);
+
+  const lineNumbers = useMemo(() => {
+    return Array.from({ length: lineCount }, (_, i) => i + 1);
+  }, [lineCount]);
+
   const refreshComments = async () => {
     if (!Number.isFinite(postId)) return;
     const res = await api.get<Comment[]>(`/comments/post/${postId}`);
@@ -200,7 +208,7 @@ const PostPage: React.FC = () => {
 
   return (
     <main className="bg-bg text-text px-4 sm:px-6 py-6 min-h-[calc(100vh-8rem)]">
-      <section className="max-w-7xl mx-auto mb-6 animate-fade-up">
+      <section className="max-w-[1400px] mx-auto mb-6 animate-fade-up">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
             <h1 className="text-3xl font-bold tracking-tight line-clamp-2">
@@ -278,22 +286,34 @@ const PostPage: React.FC = () => {
         )}
       </section>
 
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-5 gap-6">
-        <section className="lg:col-span-3 rounded-2xl bg-surface shadow-3xl glow-hover p-4 sm:p-5 flex flex-col min-h-0">
+      <div className="max-w-[1400px] mx-auto flex flex-col gap-6">
+        <section className="rounded-2xl bg-surface shadow-3xl p-4 sm:p-5 flex flex-col min-h-0">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold">Code</h2>
           </div>
 
-          <div className="mt-4 rounded-xl overflow-hidden flex-1 min-h-0">
-            <pre className="m-0! p-4 overflow-auto bg-surface-lite! h-full">
-              <code className={`language-${languageForPrism}`}>
-                {code}
-              </code>
-            </pre>
+          <div className="mt-4 rounded-xl overflow-hidden border border-surface-lite-focus bg-surface-lite">
+            <div className="flex overflow-auto">
+              <div className="w-14 shrink-0 border-r border-surface-lite-focus bg-surface-focus px-2 py-4 text-right font-mono text-sm leading-6 text-text-secondary select-none">
+                {lineNumbers.map((line) => (
+                  <div key={line} className="h-6">
+                    {line}
+                  </div>
+                ))}
+              </div>
+
+              <pre className="m-0! min-w-0 flex-1 bg-surface-lite! p-0!">
+                <code
+                  className={`language-${languageForPrism} block min-w-full px-4 py-4 text-sm leading-6`}
+                >
+                  {code}
+                </code>
+              </pre>
+            </div>
           </div>
         </section>
 
-        <section className="lg:col-span-2 rounded-2xl bg-surface shadow-3xl glow-hover p-4 sm:p-5 animate-fade-up">
+        <section className="rounded-2xl bg-surface shadow-3xl p-4 sm:p-5 animate-fade-up">
           <h2 className="text-lg font-semibold tracking-tight">Description</h2>
 
           <div className="mt-3 rounded-xl bg-surface-lite p-4">
@@ -323,7 +343,7 @@ const PostPage: React.FC = () => {
 
       <section
         id="comments-panel"
-        className="max-w-7xl mx-auto mt-8 animate-fade-up"
+        className="max-w-[1400px] mx-auto mt-8 animate-fade-up"
         hidden={commentsHidden}
       >
         <div className="rounded-2xl bg-surface shadow-3xl glow-hover overflow-hidden">

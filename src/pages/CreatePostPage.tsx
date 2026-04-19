@@ -1,8 +1,17 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { api } from "../api/axiosInstance";
 import axios from "axios";
-import type { Language } from "../types/interfaces";
-import type { Tag } from "../types/interfaces";
+
+type Language = {
+  id: number;
+  name: string;
+};
+
+type Tag = {
+  id: number;
+  name: string;
+  posts_count: number;
+};
 
 const CreatePostPage: React.FC = () => {
   const [title, setTitle] = useState("");
@@ -16,7 +25,6 @@ const CreatePostPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // tags
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const [allTags, setAllTags] = useState<Tag[]>([]);
   const [foundTags, setFoundTags] = useState<Tag[]>([]);
@@ -26,6 +34,9 @@ const CreatePostPage: React.FC = () => {
   const [tagsLoading, setTagsLoading] = useState(false);
   const [createTagLoading, setCreateTagLoading] = useState(false);
   const [tagsError, setTagsError] = useState("");
+
+  const codeTextareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const lineNumbersRef = useRef<HTMLDivElement | null>(null);
 
   const hasLanguages = languages.length > 0;
 
@@ -127,6 +138,19 @@ const CreatePostPage: React.FC = () => {
       languageId === ""
     );
   }, [loading, title, description, code, languageId]);
+
+  const lineCount = useMemo(() => {
+    return Math.max(1, code.split("\n").length);
+  }, [code]);
+
+  const lineNumbers = useMemo(() => {
+    return Array.from({ length: lineCount }, (_, i) => i + 1);
+  }, [lineCount]);
+
+  const syncScroll = () => {
+    if (!codeTextareaRef.current || !lineNumbersRef.current) return;
+    lineNumbersRef.current.scrollTop = codeTextareaRef.current.scrollTop;
+  };
 
   const addExistingTag = (tag: Tag) => {
     if (selectedTags.some((selected) => selected.id === tag.id)) return;
@@ -260,158 +284,183 @@ const CreatePostPage: React.FC = () => {
   };
 
   return (
-    <main className="min-h-[calc(100vh-8rem)] bg-bg text-text px-4 sm:px-6">
-      <section className="mx-auto mb-6 animate-fade-up">
+    <main className="min-h-[calc(100vh-8rem)] bg-bg text-text px-4 sm:px-6 py-6">
+      <section className="max-w-[1400px] mx-auto mb-6 animate-fade-up">
         <h1 className="text-3xl font-bold tracking-tight">Create post</h1>
         <p className="text-text-secondary mt-1">
-          Share your code snippet with a title, language, and a short description.
+          Share your code snippet with a title, language, tags, and a short description.
         </p>
+
+        {error && (
+          <div className="mt-5 rounded-lg bg-error/10 border border-error/30 px-3 py-2">
+            <p className="text-error text-sm">{error}</p>
+          </div>
+        )}
       </section>
 
-      <div className="mx-auto grid grid-cols-1 lg:grid-cols-5 gap-6 animate-fade-up">
-        <section className="lg:col-span-3 rounded-2xl bg-surface shadow-3xl p-4 sm:p-5 flex flex-col gap-3">
+      <form onSubmit={handleSubmit} className="max-w-[1400px] mx-auto flex flex-col gap-6 animate-fade-up">
+        <section className="rounded-2xl bg-surface shadow-3xl p-4 sm:p-5">
           <label className="text-text-secondary text-sm">Title</label>
           <input
             placeholder="e.g. Binary search in TypeScript"
-            className="rounded-lg px-3 py-3 bg-surface-lite focus:outline-none focus:bg-surface-lite-focus transition-colors duration-200 ease-in-out"
+            className="mt-2 w-full rounded-lg px-3 py-3 bg-surface-lite focus:outline-none focus:bg-surface-lite-focus transition-colors duration-200 ease-in-out"
             value={title}
             onChange={(e) => {
               setTitle(e.target.value);
               if (error) setError("");
             }}
           />
+        </section>
 
-          <div className="flex items-center justify-between mt-2">
-            <label className="text-text-secondary text-sm">Code</label>
+        <section className="rounded-2xl bg-surface shadow-3xl p-4 sm:p-5 flex flex-col min-h-0">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold">Code</h2>
             <span className="text-xs text-text-secondary">
               {code.length.toLocaleString()} chars
             </span>
           </div>
 
-          <textarea
-            className="rounded-lg px-3 py-3 bg-surface-lite focus:outline-none focus:bg-surface-lite-focus transition-colors duration-200 ease-in-out resize-none min-h-[45vh] lg:min-h-[60vh] font-mono text-sm"
-            placeholder={`Paste your code here...\n\nTip: use clear formatting for readability.`}
-            value={code}
-            onChange={(e) => {
-              setCode(e.target.value);
-              if (error) setError("");
-            }}
-          />
+          <div className="mt-4 rounded-xl overflow-hidden bg-surface-lite border border-surface-lite-focus">
+            <div className="flex min-h-[55vh] lg:min-h-[65vh]">
+              <div
+                ref={lineNumbersRef}
+                className="w-14 shrink-0 overflow-hidden border-r border-surface-lite-focus bg-surface-focus px-2 py-3 text-right text-sm leading-6 text-text-secondary select-none"
+              >
+                {lineNumbers.map((line) => (
+                  <div key={line} className="h-6">
+                    {line}
+                  </div>
+                ))}
+              </div>
+
+              <textarea
+                ref={codeTextareaRef}
+                className="w-full resize-none bg-surface-lite px-4 py-3 font-mono text-sm leading-6 text-text focus:outline-none"
+                placeholder={`Paste your code here...\n\nTip: use clear formatting for readability.`}
+                value={code}
+                onChange={(e) => {
+                  setCode(e.target.value);
+                  if (error) setError("");
+                }}
+                onScroll={syncScroll}
+                spellCheck={false}
+              />
+            </div>
+          </div>
         </section>
 
-        <form
-          onSubmit={handleSubmit}
-          className="lg:col-span-2 rounded-2xl bg-surface shadow-3xl glow-hover p-4 sm:p-5 flex flex-col gap-4"
-        >
-          {error && (
-            <div className="rounded-lg bg-error/10 border border-error/30 px-3 py-2">
-              <p className="text-error text-sm">{error}</p>
-            </div>
-          )}
+        <section className="rounded-2xl bg-surface shadow-3xl glow-hover p-4 sm:p-5">
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-2">
+                <label className="text-text-secondary text-sm">Language</label>
 
-          <div className="flex flex-col gap-2">
-            <label className="text-text-secondary text-sm">Language</label>
-
-            {hasLanguages ? (
-              <select
-                className="rounded-lg px-3 py-3 bg-surface-lite focus:outline-none focus:bg-surface-lite-focus transition-colors duration-200 ease-in-out"
-                value={languageId}
-                onChange={(e) => {
-                  const v = e.target.value;
-                  setLanguageId(v ? Number(v) : "");
-                  if (error) setError("");
-                }}
-              >
-                <option value="">Select language...</option>
-                {languages.map((l) => (
-                  <option key={l.id} value={l.id}>
-                    {l.name}
-                  </option>
-                ))}
-              </select>
-            ) : (
-              <input
-                placeholder="language_id (number)"
-                className="rounded-lg px-3 py-3 bg-surface-lite focus:outline-none focus:bg-surface-lite-focus transition-colors duration-200 ease-in-out"
-                value={languageId}
-                onChange={(e) => {
-                  const v = e.target.value.trim();
-                  setLanguageId(v === "" ? "" : Number(v));
-                  if (error) setError("");
-                }}
-              />
-            )}
-
-            {!hasLanguages && (
-              <p className="text-xs text-text-secondary">
-                Languages list is unavailable — enter a numeric <span className="text-text">language_id</span>.
-              </p>
-            )}
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <label className="text-text-secondary text-sm">Description</label>
-            <textarea
-              className="rounded-lg px-3 py-3 bg-surface-lite focus:outline-none focus:bg-surface-lite-focus transition-colors duration-200 ease-in-out resize-none min-h-32"
-              placeholder="Short description (what does this code do?)"
-              value={description}
-              onChange={(e) => {
-                setDescription(e.target.value);
-                if (error) setError("");
-              }}
-            />
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center justify-between">
-              <label className="text-text-secondary text-sm">Tags</label>
-              <button
-                type="button"
-                onClick={() => setIsTagsModalOpen(true)}
-                className="text-text-buttons rounded-lg px-3 py-2 bg-secondary hover:bg-secondary-hover transition-colors duration-200 text-sm"
-              >
-                Manage tags
-              </button>
-            </div>
-
-            <div className="rounded-lg bg-surface-lite px-3 py-3 min-h-[60px] flex flex-wrap gap-2">
-              {selectedTags.length > 0 ? (
-                selectedTags.map((tag) => (
-                  <span
-                    key={tag.id}
-                    className="inline-flex items-center rounded-full bg-primary/15 border border-primary/30 px-3 py-1 text-sm text-text"
+                {hasLanguages ? (
+                  <select
+                    className="rounded-lg px-3 py-3 bg-surface-lite focus:outline-none focus:bg-surface-lite-focus transition-colors duration-200 ease-in-out"
+                    value={languageId}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      setLanguageId(v ? Number(v) : "");
+                      if (error) setError("");
+                    }}
                   >
-                    #{tag.name}
-                  </span>
-                ))
-              ) : (
-                <span className="text-sm text-text-secondary">No tags selected</span>
-              )}
+                    <option value="">Select language...</option>
+                    {languages.map((l) => (
+                      <option key={l.id} value={l.id}>
+                        {l.name}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <input
+                    placeholder="language_id (number)"
+                    className="rounded-lg px-3 py-3 bg-surface-lite focus:outline-none focus:bg-surface-lite-focus transition-colors duration-200 ease-in-out"
+                    value={languageId}
+                    onChange={(e) => {
+                      const v = e.target.value.trim();
+                      setLanguageId(v === "" ? "" : Number(v));
+                      if (error) setError("");
+                    }}
+                  />
+                )}
+
+                {!hasLanguages && (
+                  <p className="text-xs text-text-secondary">
+                    Languages list is unavailable — enter a numeric <span className="text-text">language_id</span>.
+                  </p>
+                )}
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                  <label className="text-text-secondary text-sm">Tags</label>
+                  <button
+                    type="button"
+                    onClick={() => setIsTagsModalOpen(true)}
+                    className="rounded-lg px-3 py-2 bg-surface-lite hover:bg-surface-lite-focus transition-colors duration-200 text-sm"
+                  >
+                    Manage tags
+                  </button>
+                </div>
+
+                <div className="rounded-lg bg-surface-lite px-3 py-3 min-h-[60px] flex flex-wrap gap-2">
+                  {selectedTags.length > 0 ? (
+                    selectedTags.map((tag) => (
+                      <span
+                        key={tag.id}
+                        className="inline-flex items-center rounded-full bg-primary/15 border border-primary/30 px-3 py-1 text-sm text-text"
+                      >
+                        #{tag.name}
+                      </span>
+                    ))
+                  ) : (
+                    <span className="text-sm text-text-secondary">No tags selected</span>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label className="text-text-secondary text-sm">Description</label>
+                <textarea
+                  className="rounded-lg px-3 py-3 bg-surface-lite focus:outline-none focus:bg-surface-lite-focus transition-colors duration-200 ease-in-out resize-none min-h-36"
+                  placeholder="Short description (what does this code do?)"
+                  value={description}
+                  onChange={(e) => {
+                    setDescription(e.target.value);
+                    if (error) setError("");
+                  }}
+                />
+              </div>
+
+              <div className="mt-6 flex justify-end">
+                <button
+                  type="submit"
+                  disabled={isDisabled}
+                  className="flex bg-primary hover:bg-primary-hover rounded-lg px-6 py-3 text-text-buttons transition-all duration-200 ease-in-out disabled:opacity-70 hover:-translate-y-0.5 active:translate-y-0"
+                >
+                  {loading ? "Creating..." : "Create"}
+                </button>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-2 h-full">
+                <label className="text-text-secondary text-sm">About</label>
+                <textarea
+                  className="rounded-lg px-3 py-3 bg-surface-lite focus:outline-none focus:bg-surface-lite-focus transition-colors duration-200 ease-in-out resize-none min-h-[260px] h-full"
+                  placeholder="Extra context, usage notes, caveats, etc."
+                  value={about}
+                  onChange={(e) => {
+                    setAbout(e.target.value);
+                    if (error) setError("");
+                  }}
+                />
+              </div>
             </div>
           </div>
-
-          <div className="h-full flex flex-col gap-2">
-            <label className="text-text-secondary text-sm">About</label>
-            <textarea
-              className="h-full rounded-lg px-3 py-3 bg-surface-lite focus:outline-none focus:bg-surface-lite-focus transition-colors duration-200 ease-in-out resize-none min-h-28"
-              placeholder="Extra context, usage notes, caveats, etc."
-              value={about}
-              onChange={(e) => {
-                setAbout(e.target.value);
-                if (error) setError("");
-              }}
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={isDisabled}
-            className="bg-primary hover:bg-primary-hover rounded-lg px-4 py-4 text-text-buttons transition-all duration-200 ease-in-out disabled:opacity-70 hover:-translate-y-0.5 active:translate-y-0"
-          >
-            {loading ? "Creating..." : "Create"}
-          </button>
-        </form>
-      </div>
+        </section>
+      </form>
 
       {isTagsModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/60 px-4 py-6 overflow-y-auto">
@@ -422,7 +471,7 @@ const CreatePostPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={closeTagsModal}
-                  className="text-text-buttons rounded-lg px-3 py-2 bg-secondary hover:bg-secondary-hover transition-colors duration-200"
+                  className="rounded-lg px-3 py-2 bg-surface-lite hover:bg-surface-lite-focus transition-colors duration-200"
                 >
                   Close
                 </button>
@@ -436,7 +485,7 @@ const CreatePostPage: React.FC = () => {
 
               <div className="flex flex-col gap-2">
                 <label className="text-text-secondary text-sm">Selected tags</label>
-                <div className="rounded-xl bg-surface-lite p-3 min-h-[48px] flex flex-wrap gap-2">
+                <div className="rounded-xl bg-surface-lite p-3 min-h-[72px] flex flex-wrap gap-2">
                   {selectedTags.length > 0 ? (
                     selectedTags.map((tag) => (
                       <div
@@ -513,6 +562,16 @@ const CreatePostPage: React.FC = () => {
                 <p className="text-xs text-text-secondary">
                   Create a new tag only if there is no suitable existing tag.
                 </p>
+              </div>
+
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={closeTagsModal}
+                  className="rounded-lg px-4 py-3 bg-primary hover:bg-primary-hover text-text-buttons transition-colors duration-200"
+                >
+                  Done
+                </button>
               </div>
             </div>
           </div>
