@@ -16,6 +16,9 @@ import commentIcon from "../components/svg/comment.svg";
 import axios from "axios";
 import type { PostByIdResponse } from "../types/interfaces";
 
+const VIEW_COOKIE_PREFIX = "viewed_post_";
+const VIEW_COOKIE_MAX_AGE = 60 * 60 * 24;
+
 const PostPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const postId = Number(id);
@@ -34,6 +37,7 @@ const PostPage: React.FC = () => {
   const [tags, setTags] = useState<string[]>([]);
 
   const [likeCount, setLikeCount] = useState(0);
+  const [viewsCount, setViewsCount] = useState(0);
   const [commentCount, setCommentCount] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
 
@@ -62,6 +66,20 @@ const PostPage: React.FC = () => {
   const lineNumbers = useMemo(() => {
     return Array.from({ length: lineCount }, (_, i) => i + 1);
   }, [lineCount]);
+
+  const getCookie = (name: string) => {
+    const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const match = document.cookie.match(
+      new RegExp(`(?:^|; )${escapedName}=([^;]*)`)
+    );
+    return match ? decodeURIComponent(match[1]) : null;
+  };
+
+  const setCookie = (name: string, value: string, maxAgeSeconds: number) => {
+    document.cookie = `${encodeURIComponent(name)}=${encodeURIComponent(
+      value
+    )}; max-age=${maxAgeSeconds}; path=/; SameSite=Lax`;
+  };
 
   const refreshComments = async () => {
     if (!Number.isFinite(postId)) return;
@@ -117,6 +135,7 @@ const PostPage: React.FC = () => {
       setTags(p.tags ?? []);
 
       setLikeCount(p.like_count);
+      setViewsCount(p.views_count);
       setCommentCount(p.comment_count);
 
       try {
@@ -136,6 +155,23 @@ const PostPage: React.FC = () => {
       } else {
         setError("Failed to load the post. Please try again.");
       }
+    }
+  };
+
+  const incrementViewIfNeeded = async () => {
+    if (!Number.isFinite(postId)) return;
+
+    const cookieName = `${VIEW_COOKIE_PREFIX}${postId}`;
+    const alreadyViewed = getCookie(cookieName);
+
+    if (alreadyViewed) return;
+
+    try {
+      await api.post(`/posts/${postId}/view`);
+      setViewsCount((prev) => prev + 1);
+      setCookie(cookieName, "1", VIEW_COOKIE_MAX_AGE);
+    } catch (err) {
+      console.log(err);
     }
   };
 
@@ -188,6 +224,7 @@ const PostPage: React.FC = () => {
 
   useEffect(() => {
     fetchPostById();
+    incrementViewIfNeeded();
     window.scrollTo(0, 0);
   }, [id]);
 
@@ -257,6 +294,14 @@ const PostPage: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-3 shrink-0">
+            <div
+              className="flex items-center gap-2 rounded-xl bg-surface px-3 py-2 shadow-3xl"
+              title="Views"
+            >
+              <span className="text-sm text-text-secondary">{viewsCount}</span>
+              <span aria-hidden>👁️</span>
+            </div>
+
             <button
               type="button"
               onClick={handleLikeSubmit}

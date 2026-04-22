@@ -47,6 +47,7 @@ const HomePage: React.FC = () => {
         createdAt: p.created_at,
         likes: p.like_count,
         comments: p.comment_count,
+        views: p.views_count,
       }));
 
       setPosts((prev) => {
