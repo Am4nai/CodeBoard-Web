@@ -26,6 +26,9 @@ const SearchPage: React.FC = () => {
   const [posts, setPosts] = useState<PostCardProps[]>([]);
   const [page, setPage] = useState(1);
 
+  const sortCollection = ["views", "likes", "newest"]
+  const [sort, setSort] = useState("newest")
+
   const parseQuery = (raw: string) => {
     const parts = raw.split(" ").filter(Boolean);
     const tags = parts.filter((w) => w.startsWith("#"));
@@ -60,7 +63,7 @@ const SearchPage: React.FC = () => {
 
     try {
       const response = await api.get<SearchPostsResponse>(
-        `/posts/search?query=${encodeURIComponent(q)}&page=${pageToLoad}&limit=15`
+        `/posts/search?query=${encodeURIComponent(q)}&sort=${sort}&page=${pageToLoad}&limit=15`
       );
 
       const mapped: PostCardProps[] = response.data.posts.map((p) => ({
@@ -100,7 +103,7 @@ const SearchPage: React.FC = () => {
     setPage(1);
     setPosts([]);
     fetchPosts({ reset: true, pageOverride: 1 });
-  }, [location.search]);
+  }, [location.search, sort]);
 
   useEffect(() => {
     if (page > 1) fetchPosts();
@@ -125,12 +128,26 @@ const SearchPage: React.FC = () => {
         ))}
       </div>
 
-      <h1 className="text-3xl font-bold mb-4">
-        Results for: <span className="text-primary">{query}</span>
-      </h1>
+      <span className="flex justify-between">
+        <h1 className="text-3xl font-bold mb-4">
+          Results for: <span className="text-primary">{query}</span>
+        </h1>
+
+        <span> Sort: 
+          <select
+            className="bg-surface-lite rounded-lg px-4 py-2 ml-2 focus:outline-none focus:bg-surface-lite-focus transition-colors duration-200"
+            value={sort}
+            onChange={(e) => {setSort(e.target.value)}}
+          >
+            {sortCollection.map((col) => (
+              <option key={col} value={col}>{col}</option>
+            ))}
+          </select>
+        </span>
+      </span>
 
       {error && <p className="text-error">{error}</p>}
-      {loading && <p>Загрузка...</p>}
+      {loading && <p>Loading...</p>}
 
       <Masonry breakpointCols={breakpointColumnsObj} className="flex gap-6" columnClassName="space-y-6">
         {posts.map((post) => (
