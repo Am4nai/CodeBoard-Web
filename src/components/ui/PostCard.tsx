@@ -12,6 +12,7 @@ const PostCard: React.FC<PostCardProps> = ({
   createdAt,
   likes,
   comments,
+  views,
   editable,
   mode,
   collectionId,
@@ -63,6 +64,11 @@ const PostCard: React.FC<PostCardProps> = ({
             </div>
 
             <div className="flex items-center gap-3 shrink-0 text-sm text-text-secondary">
+              <span className="flex items-center gap-1" title="Views">
+                <span>{views ?? 0}</span>
+                <span aria-hidden>👁️</span>
+              </span>
+
               <span className="flex items-center gap-1" title="Likes">
                 <span>{likes ?? 0}</span>
                 <span aria-hidden>❤️</span>

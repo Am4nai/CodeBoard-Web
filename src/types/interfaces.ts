@@ -8,6 +8,7 @@ export interface PostCardProps {
   createdAt: string;
   likes?: number;
   comments?: number;
+  views?: number;
   editable?: boolean;
   fetchCollectionData?: () => void;
 
@@ -19,7 +20,7 @@ export interface UserProfile {
   avatar_url: string | null;
   description: string | null;
   about: string | null;
-};
+}
 
 export interface User {
   id: number;
@@ -28,7 +29,7 @@ export interface User {
   role: string;
   created_at: string;
   profile: UserProfile | null;
-};
+}
 
 export interface AuthContextType {
   user: User | null;
@@ -88,6 +89,7 @@ export type CollectionWithPostsResponse = Collection & {
     language_id: number;
     language_name: string;
     like_count: number;
+    views_count: number;
     created_at: string;
     updated_at: string;
     comment_count: number;
@@ -117,6 +119,7 @@ export type PostByIdResponse = {
   language_id: number;
   language_name: string;
   like_count: number;
+  views_count: number;
   comment_count: number;
   created_at: string;
   updated_at: string;
@@ -141,6 +144,7 @@ export type PostsResponse = {
     language_id: number;
     language_name: string;
     like_count: number;
+    views_count: number;
     created_at: string;
     updated_at: string;
     comment_count: number;
@@ -175,6 +179,7 @@ export type UserPostsResponse = {
     language_id: number;
     language_name: string;
     like_count: number;
+    views_count: number;
     created_at: string;
     updated_at: string;
     comment_count: number;
@@ -194,6 +199,7 @@ export type SearchPostsResponse = {
     language_id: number;
     language_name: string;
     like_count: number;
+    views_count: number;
     created_at: string;
     updated_at: string;
     comment_count: number;
@@ -206,7 +212,6 @@ export interface AdminUser {
   email: string;
   role: string;
   created_at: string;
-
   avatar_url: string | null;
   description: string | null;
   about: string | null;
