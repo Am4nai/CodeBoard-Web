@@ -214,11 +214,11 @@ export default function Header() {
                     Profile
                   </Link>
                   <Link
-                    to="/settings"
+                    to="/mobile"
                     className="block px-4 py-2 text-sm text-text hover:bg-bg transition-colors"
                     onClick={closeAll}
                   >
-                    Settings
+                    Mobile
                   </Link>
                   <button
                     onClick={handleLogout}
