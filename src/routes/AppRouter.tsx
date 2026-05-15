@@ -11,6 +11,7 @@ import RegisterPage from "../pages/RegisterPage";
 import NotFoundPage from "../pages/NotFoundPage";
 import AdminPage from "../pages/AdminPage";
 import CollectionPage from "../pages/CollectionPage";
+import MobilePage from "../pages/MobilePage";
 
 import ProtectedRoute from "../components/ui/ProtectedRoute";
 
@@ -43,6 +44,7 @@ const AppRouter = () => {
           />
 
           <Route path="collections" element={<CollectionPage />} />
+          <Route path="mobile" element={<MobilePage />} />
         </Route>
 
         <Route path="/login" element={<LoginPage />} />
