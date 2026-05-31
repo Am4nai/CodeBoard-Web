@@ -184,8 +184,8 @@ export default function Header() {
           <Link to="/create" className="hover:text-primary-hover transition-colors">
             Create
           </Link>
-          <Link to="/collections" className="hover:text-primary-hover transition-colors">
-            Collections
+          <Link to="/mobile" className="hover:text-primary-hover transition-colors">
+            Mobile
           </Link>
         </nav>
 
@@ -214,11 +214,11 @@ export default function Header() {
                     Profile
                   </Link>
                   <Link
-                    to="/mobile"
+                    to="/collections"
                     className="block px-4 py-2 text-sm text-text hover:bg-bg transition-colors"
                     onClick={closeAll}
                   >
-                    Mobile
+                    Collections
                   </Link>
                   <button
                     onClick={handleLogout}
