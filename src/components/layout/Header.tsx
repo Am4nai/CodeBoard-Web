@@ -317,11 +317,11 @@ export default function Header() {
               Create
             </Link>
             <Link
-              to="/collections"
+              to="/mobile"
               className="rounded-lg px-4 py-3 bg-surface-lite hover:bg-surface-lite-focus transition-colors text-text"
               onClick={closeAll}
             >
-              Collections
+              Mobile
             </Link>
 
             {user ? (
@@ -334,11 +334,11 @@ export default function Header() {
                   Profile
                 </Link>
                 <Link
-                  to="/settings"
+                  to="/collections"
                   className="rounded-lg px-4 py-3 bg-surface-lite hover:bg-surface-lite-focus transition-colors text-text"
                   onClick={closeAll}
                 >
-                  Settings
+                  Collections
                 </Link>
                 <button
                   onClick={handleLogout}
