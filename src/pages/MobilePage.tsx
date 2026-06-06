@@ -22,7 +22,7 @@ const MobilePage: React.FC = () => {
 
               <div className="mt-6 flex flex-col sm:flex-row gap-3">
                 <a
-                  href="/downloads/codeboard.apk"
+                  href="https://github.com/Am4nai/CodeBoard-Mobile/releases/tag/release"
                   download
                   className="glow-hover inline-flex justify-center rounded-xl bg-primary hover:bg-primary-hover px-5 py-3 text-text-buttons font-semibold transition-colors"
                 >
